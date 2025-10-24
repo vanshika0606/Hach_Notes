@@ -14,16 +14,21 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user }) {
-      // Assign fixed internal id only on first login
-      if (user && !token.userId) {
-        (token as any).userId = 101; // cast token to any
+      // Allow token to have any extra property without casting to 'any'
+      const t = token as typeof token & { userId?: number };
+      if (user && !t.userId) {
+        t.userId = 101;
       }
-      return token;
+      return t;
     },
+
     async session({ session, token }) {
-      // Attach userId to session object
-      (session as any).userId = (token as any).userId as number;
-      return session;
+      // Attach userId from token to session
+      const t = token as typeof token & { userId?: number };
+      return {
+        ...session,
+        userId: t.userId,
+      };
     },
   },
 });
