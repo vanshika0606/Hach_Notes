@@ -207,7 +207,7 @@ export default function NotesApp() {
             <div className="space-y-3 max-h-[calc(100vh-280px)] overflow-y-auto">
               {filteredNotes.map((note) => (
                 <div
-                  key={note.id}
+                  key={note.id+ note.date}
                   onClick={() => setSelectedNote(note)}
                   className={`p-4 rounded-xl cursor-pointer transition-all duration-200 group ${
                     selectedNote?.id === note.id
