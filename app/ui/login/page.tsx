@@ -11,6 +11,7 @@ export default function LoginPage() {
    const router = useRouter();
    useEffect(() => {
     if (session) {
+      
       router.push(`/ui/notes?userId=${session.userId}`);// redirect to your notes route
     }
   }, [session, router]);
