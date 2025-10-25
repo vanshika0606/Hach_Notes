@@ -153,16 +153,112 @@ export default function NotesApp() {
     return <div className="text-white text-center mt-20">Loading...</div>;
 
   if (wow) {
+    const hackedHash = `SHA-256:${Array.from({ length: 64 }, () =>
+      Math.floor(Math.random() * 16).toString(16)
+    ).join("")}`;
+
+    const copyToClipboard = () => {
+      navigator.clipboard.writeText(hackedHash);
+    };
+
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-red-950 via-red-900 to-rose-950 text-white p-6 relative overflow-hidden">
-        <h1 className="text-6xl font-bold mb-6">Unauthorized Access!</h1>
-        <p className="mb-6">You cannot access these notes.</p>
-        <button
-          onClick={() => signOut({ callbackUrl: "/ui/login" })}
-          className="bg-white text-red-900 px-6 py-3 rounded-xl font-bold"
-        >
-          Logout
-        </button>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-red-500 p-6 relative overflow-hidden font-mono">
+        {/* Animated background lines */}
+        <div className="absolute inset-0 opacity-10">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute h-px bg-red-500 animate-pulse"
+              style={{
+                top: `${i * 5}%`,
+                left: 0,
+                right: 0,
+                animationDelay: `${i * 0.1}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Warning symbol */}
+        <div className="relative z-10 mb-8 animate-pulse">
+          <div className="w-32 h-32 border-4 border-red-500 rotate-45 flex items-center justify-center">
+            <div className="w-24 h-24 border-4 border-red-600 -rotate-45 flex items-center justify-center">
+              <span className="text-6xl font-bold rotate-45">⚠</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Main content */}
+        <div className="relative z-10 text-center max-w-2xl">
+          <h1 className="text-6xl font-bold mb-4 tracking-wider animate-pulse">
+            ACCESS DENIED
+          </h1>
+          <div className="text-xl mb-2 text-red-400">
+            [UNAUTHORIZED ACCESS DETECTED]
+          </div>
+          <p className="text-lg mb-8 text-red-300">
+            Security breach attempt logged. You cannot access these notes.
+          </p>
+
+          {/* Hash display */}
+          <div className="bg-black border-2 border-red-500 rounded-lg p-6 mb-8 shadow-[0_0_20px_rgba(239,68,68,0.3)]">
+            <div className="text-sm text-red-400 mb-2 text-left">
+              INCIDENT HASH:
+            </div>
+            <div className="flex items-center gap-3">
+              <code className="flex-1 text-xs text-red-300 break-all text-left bg-red-950/30 p-3 rounded border border-red-900">
+                {hackedHash}
+              </code>
+              <button
+                onClick={copyToClipboard}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded transition-all hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] flex-shrink-0"
+                title="Copy hash"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Logout button */}
+          <button
+            onClick={() => signOut({ callbackUrl: "/ui/login" })}
+            className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] border-2 border-red-500"
+          >
+            &gt;&gt; TERMINATE SESSION
+          </button>
+
+          {/* Footer warning */}
+          <div className="mt-8 text-xs text-red-400 opacity-70">
+            This incident has been reported to system administrators.
+          </div>
+        </div>
+
+        {/* Corner decorations */}
+        <div className="absolute top-4 left-4 text-red-500 opacity-30 text-xs">
+          [SYS_ERR_401]
+        </div>
+        <div className="absolute top-4 right-4 text-red-500 opacity-30 text-xs">
+          [AUTH_FAIL]
+        </div>
+        <div className="absolute bottom-4 left-4 text-red-500 opacity-30 text-xs">
+          {new Date().toISOString()}
+        </div>
+        <div className="absolute bottom-4 right-4 text-red-500 opacity-30 text-xs">
+          [LOG_ID:{Math.floor(Math.random() * 999999)}]
+        </div>
       </div>
     );
   }
