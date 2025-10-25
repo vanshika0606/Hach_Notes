@@ -246,7 +246,7 @@ export default function NotesApp() {
           </div>
         </div>
 
-        {/* Corner decorations */}
+        {/* Corner  */}
         <div className="absolute top-4 left-4 text-red-500 opacity-30 text-xs">
           [SYS_ERR_401]
         </div>
