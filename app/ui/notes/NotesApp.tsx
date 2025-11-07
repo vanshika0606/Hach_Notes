@@ -22,6 +22,8 @@ export default function NotesApp() {
   const [editContent, setEditContent] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [wow, setWow] = useState(false);
+  const [uniqueCode, setUniqueCode] = useState<string | null>(null);
+  const [codeLoading, setCodeLoading] = useState(false);
 
   const searchParams = useSearchParams();
   const paramUserId = searchParams.get("userId");
@@ -61,6 +63,33 @@ export default function NotesApp() {
     };
     fetchData();
   }, [paramUserId, searchQuery]);
+
+  useEffect(() => {
+    const fetchAccessDeniedCode = async () => {
+      setCodeLoading(true);
+      try {
+        const res = await fetch("/api/access-code", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to fetch access code");
+        const data = await res.json();
+        setUniqueCode(
+          typeof data?.uniqueGeneratedCode === "string"
+            ? data.uniqueGeneratedCode
+            : null
+        );
+      } catch (err) {
+        console.error(err);
+        setUniqueCode(null);
+      } finally {
+        setCodeLoading(false);
+      }
+    };
+
+    if (wow) {
+      fetchAccessDeniedCode();
+    } else {
+      setUniqueCode(null);
+    }
+  }, [wow]);
 
   // ---------- HANDLERS ----------
   const handleAddNote = async () => {
@@ -153,12 +182,9 @@ export default function NotesApp() {
     return <div className="text-white text-center mt-20">Loading...</div>;
 
   if (wow) {
-    const hackedHash = `SHA-256:${Array.from({ length: 64 }, () =>
-      Math.floor(Math.random() * 16).toString(16)
-    ).join("")}`;
-
     const copyToClipboard = () => {
-      navigator.clipboard.writeText(hackedHash);
+      if (!uniqueCode) return;
+      navigator.clipboard.writeText(uniqueCode);
     };
 
     return (
@@ -207,11 +233,14 @@ export default function NotesApp() {
             </div>
             <div className="flex items-center gap-3">
               <code className="flex-1 text-xs text-red-300 break-all text-left bg-red-950/30 p-3 rounded border border-red-900">
-                {hackedHash}
+                {codeLoading
+                  ? "Fetching incident code..."
+                  : uniqueCode ?? "Unavailable"}
               </code>
               <button
                 onClick={copyToClipboard}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded transition-all hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] flex-shrink-0"
+                disabled={codeLoading || !uniqueCode}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded transition-all hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] flex-shrink-0 disabled:opacity-50 disabled:hover:shadow-none disabled:cursor-not-allowed"
                 title="Copy hash"
               >
                 <svg
